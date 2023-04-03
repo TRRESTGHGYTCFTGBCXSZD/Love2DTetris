@@ -24,6 +24,10 @@ function love.load()
 	garbageimagetype.red = love.graphics.newImage("garbagebar_red.png")
 	garbageimagetype.yellow = love.graphics.newImage("garbagebar_yellow.png")
 	garbageimagetype.white = love.graphics.newImage("garbagebar_white.png")
+	boardwin = love.graphics.newImage("boardwin.png")
+	boardlose = love.graphics.newImage("boardlose.png")
+	boarddraw = love.graphics.newImage("boarddraw.png")
+	perfectclear = love.graphics.newImage("boardpc.png")
 	lock = love.audio.newSource("lock.wav", "static")
 	rotate = love.audio.newSource("rotate.wav", "static")
 	prerotate = love.audio.newSource("prerotate.wav", "static")
@@ -37,6 +41,11 @@ function love.load()
 	linecleardouble = love.audio.newSource("linedouble.wav", "static")
 	linecleartriple = love.audio.newSource("linetriple.wav", "static")
 	lineclearquad = love.audio.newSource("linequad.wav", "static")
+	finish = love.audio.newSource("finish.wav", "static")
+	finishdraw = love.audio.newSource("finishdraw.wav", "static")
+	finish1p = love.audio.newSource("p1win.wav", "static")
+	finish2p = love.audio.newSource("p2win.wav", "static")
+	finishdrawcom = love.audio.newSource("drawgame.wav", "static")
 	downtimereset = 60
 	controls = {["P1Left"]={"kbd","left"},["P1Right"]={"kbd","right"},["P1SoftDrop"]={"kbd","down"},["P1HardDrop"]={"kbd","up"},["P1CCW"]={"kbd","z"},["P1CW"]={"kbd","x"},["P1Hold"]={"kbd","space"},
 	["P2Left"]={"none","none"},["P2Right"]={"none","none"},["P2SoftDrop"]={"none","none"},["P2HardDrop"]={"none","none"},["P2CCW"]={"none","none"},["P2CW"]={"none","none"},["P2Hold"]={"none","none"},}
@@ -435,6 +444,7 @@ function initplayer(player)
 	player.tspin="no"
 	player.btbs=-1
 	player.combo=-1
+	player.perfectclear=false
 	player.leftinput=false
 	player.leftdas=10
 	player.rightinput=false
@@ -443,6 +453,7 @@ function initplayer(player)
 	player.hdinput=false
 	player.donotnext=false
 	player.stillholding=false
+	player.amisafe=true
 	player.downwardtime=downtimereset
 	player.movereset=15
 	player.rotreset=15
@@ -844,7 +855,7 @@ function tspintest(board,rotation,x,y)
 end
 function modmod(a,b)return a-math.floor(a/b)*b end
 function updateplayer(player)
-	if player.pieceactive == false then
+	if player.pieceactive == false and player.dead == false then
 		player.pieceactive = true
 		if not player.donotnext then
 			player.piececurrent = table.remove(player.piecequeue,1)
@@ -1042,16 +1053,20 @@ function updateplayer(player)
 			end
 			player.rightdas = player.rightdas - 1
 		end
-		if player.locktime <= 0 or player.movereset <= 0 or player.rotreset <= 0 then
+		if player.locktime <= 0 or player.movereset <= 0 or player.rotreset <= 0 and (not (player.hdinput or player.holdinput)) then
 			while piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) == false do
 				player.piecey = player.piecey+1
 			end
 			player.piecey = player.piecey-1
 			player.pieceactive = false
+			player.amisafe = false
 			for pies2 = 1 ,4 do
 				for pies1 = 1 ,4 do
 					if (piecetype[player.piececurrent][player.piecerotation][pies2][pies1] == 1) and (player.piecey+pies2-1 >= 1) then
 						player.board[player.piecey+pies2-1][player.piecex+pies1-1] = player.piececurrent
+						if player.piecey+pies2 >= 22 then
+							player.amisafe = true
+						end
 					end
 				end
 			end
@@ -1065,17 +1080,21 @@ function updateplayer(player)
 			player.piecey = player.piecey-1
 			player.pieceactive = false
 			player.hdinput = false
+			player.amisafe = false
 			for pies2 = 1 ,4 do
 				for pies1 = 1 ,4 do
 					if (piecetype[player.piececurrent][player.piecerotation][pies2][pies1] == 1) and (player.piecey+pies2-1 >= 1) then
 						player.board[player.piecey+pies2-1][player.piecex+pies1-1] = player.piececurrent
+						if player.piecey+pies2 >= 22 then
+							player.amisafe = true
+						end
 					end
 				end
 			end
 			love.audio.stop(lock)
 			love.audio.play(lock)
 		end
-		if player.holdinput and (not player.holdlock) then
+		if player.holdinput and (not (player.holdlock or player.hdinput)) then
 			player.pieceactive = false
 			player.donotnext = true
 			player.stillholding = true
@@ -1099,9 +1118,14 @@ function updateplayer(player)
 				love.audio.play(tspinnotify)
 			end
 		end
+		if not player.amisafe then
+			player.dead = true
+			love.audio.stop(dead)
+			love.audio.play(dead)
+		end
 	end
 end
-resettime = 60
+resettime = 300
 winner = "none"
 function love.update(dt)
 frames = frames + (dt*60)
@@ -1114,7 +1138,7 @@ frames = frames + (dt*60)
 		updateplayer(p1)
 		updateplayer(p2)
 	end
-	if p1.dead or p2.dead and winner ~= "none" then
+	if (p1.dead or p2.dead) and winner == "none" then
 		if p1.dead and p2.dead then
 			winner = "draw"
 		elseif p2.dead then
@@ -1127,10 +1151,30 @@ frames = frames + (dt*60)
 		love.audio.stop(music)
 		resettime = resettime - 1
 		if resettime == 240 then
+			p1.pieceactive = false
+			p2.pieceactive = false
+			if winner == "draw" then
+				love.audio.stop(finishdraw)
+				love.audio.play(finishdraw)
+			else
+				love.audio.stop(finish)
+				love.audio.play(finish)
+			end
+			if winner == "draw" then
+				love.audio.stop(finishdrawcom)
+				love.audio.play(finishdrawcom)
+			elseif winner == "p1" then
+				love.audio.stop(finish1p)
+				love.audio.play(finish1p)
+			elseif winner == "p2" then
+				love.audio.stop(finish2p)
+				love.audio.play(finish2p)
+			end
 		end
 		if resettime <= 0 then
 			initplayer(p1)
 			initplayer(p2)
+			winner = "none"
 			love.audio.play(music)
 		end
 	end
@@ -1145,8 +1189,14 @@ frames = frames + (dt*60)
 			end
 			if p1.lineclears >= 2 or p1.combo >= 2 then
 				local reattackeris = p1.lineclears
-				if p1.tspin == "full" then reattackeris = p1.lineclears * 2 end
-				reattackeris = math.floor(reattackeris * ((math.max(p1.btbs,0)*0.2)+1) * ((math.max(p1.combo,0)*0.2)+1))
+				if p1.lineclears < 4 and (not (p1.tspin == "full")) then reattackeris = reattackeris - 1 end
+				if p1.tspin == "full" then reattackeris = reattackeris * 2 end
+				if p1.btbs >= 1 then reattackeris = reattackeris + 1 end
+				if p1.combo >= 2 then reattackeris = reattackeris + 1 end
+				if p1.combo >= 4 then reattackeris = reattackeris + 1 end
+				if p1.combo >= 6 then reattackeris = reattackeris + 1 end
+				if p1.combo >= 8 then reattackeris = reattackeris + 1 end
+				if p1.combo >= 11 then reattackeris = reattackeris + 1 end
 				p1.attackincoming = p1.attackincoming - reattackeris
 				if p1.attackincoming < 0 then
 					p2.attackincoming = p2.attackincoming - p1.attackincoming
@@ -1178,8 +1228,14 @@ frames = frames + (dt*60)
 			end
 			if p2.lineclears >= 2 or p2.combo >= 2 then
 				local reattackeris = p2.lineclears
-				if p1.tspin == "full" then reattackeris = p1.lineclears * 2 end
-				reattackeris = math.floor(reattackeris * ((math.max(p1.btbs,0)*0.2)+1) * ((math.max(p1.combo,0)*0.2)+1))
+				if p2.lineclears < 4 and (not (p1.tspin == "full")) then reattackeris = reattackeris - 1 end
+				if p2.tspin == "full" then reattackeris = reattackeris * 2 end
+				if p2.btbs >= 1 then reattackeris = reattackeris + 1 end
+				if p2.combo >= 2 then reattackeris = reattackeris + 1 end
+				if p2.combo >= 4 then reattackeris = reattackeris + 1 end
+				if p2.combo >= 6 then reattackeris = reattackeris + 1 end
+				if p2.combo >= 8 then reattackeris = reattackeris + 1 end
+				if p2.combo >= 11 then reattackeris = reattackeris + 1 end
 				p2.attackincoming = p2.attackincoming - reattackeris
 				if p2.attackincoming < 0 then
 					p1.attackincoming = p1.attackincoming - p2.attackincoming
@@ -1293,5 +1349,26 @@ function love.draw()
 	love.graphics.draw(bg, 0, 0)
 	drawplayer(p1,160,280,1)
 	drawplayer(p2,480,280,1)
-	font = love.graphics.getFont()
+	--font = love.graphics.getFont()
+	if resettime <= 240 then
+		if winner == "p1" then
+			p1info = boardwin
+			p2info = boardlose
+		elseif winner == "p2" then
+			p2info = boardwin
+			p1info = boardlose
+		elseif winner == "draw" then
+			p1info = boarddraw
+			p2info = boarddraw
+		end
+		local size = 1
+		if resettime > 210 then
+			size = (240-resettime)/30
+		end
+		if resettime <= 30 then
+			size = (resettime)/30
+		end
+		drawsprite(p1info,160,280,80,160,size,size)
+		drawsprite(p2info,480,280,80,160,size,size)
+	end
 end
