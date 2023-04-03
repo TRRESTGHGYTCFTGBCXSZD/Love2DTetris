@@ -1103,13 +1103,20 @@ function updateplayer(player)
 	if player.pieceactive == false and (not player.stillholding) and player.dead == false then
 		player.linecleartrigger = true
 		player.lineclears = 0
+		local pccheck = true
 		for ita = 1,40 do
 			if not tablltablltabllcontains(player.board[ita],"E") then
 				table.remove(player.board,ita)
 				table.insert(player.board,1,{"E","E","E","E","E","E","E","E","E","E",})
 				player.lineclears = player.lineclears + 1
 			end
+			for ite = 1,10 do
+				if player.board[ita][ite] ~= "E" then
+					pccheck = false
+				end
+			end
 		end
+		player.perfectclear = pccheck
 		if player.lineclears > 0 then
 			love.audio.stop(lineclear)
 			love.audio.play(lineclear)
