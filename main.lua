@@ -27,7 +27,7 @@ function love.load()
 	boardwin = love.graphics.newImage("boardwin.png")
 	boardlose = love.graphics.newImage("boardlose.png")
 	boarddraw = love.graphics.newImage("boarddraw.png")
-	perfectclear = love.graphics.newImage("boardpc.png")
+	perfectclearboard = love.graphics.newImage("boardpc.png")
 	lock = love.audio.newSource("lock.wav", "static")
 	rotate = love.audio.newSource("rotate.wav", "static")
 	prerotate = love.audio.newSource("prerotate.wav", "static")
@@ -46,6 +46,7 @@ function love.load()
 	finish1p = love.audio.newSource("p1win.wav", "static")
 	finish2p = love.audio.newSource("p2win.wav", "static")
 	finishdrawcom = love.audio.newSource("drawgame.wav", "static")
+	tetrisparticles = love.graphics.newParticleSystem( bg, buffer )
 	downtimereset = 60
 	controls = {["P1Left"]={"kbd","left"},["P1Right"]={"kbd","right"},["P1SoftDrop"]={"kbd","down"},["P1HardDrop"]={"kbd","up"},["P1CCW"]={"kbd","z"},["P1CW"]={"kbd","x"},["P1Hold"]={"kbd","space"},
 	["P2Left"]={"none","none"},["P2Right"]={"none","none"},["P2SoftDrop"]={"none","none"},["P2HardDrop"]={"none","none"},["P2CCW"]={"none","none"},["P2CW"]={"none","none"},["P2Hold"]={"none","none"},}
@@ -458,6 +459,7 @@ function initplayer(player)
 	player.movereset=15
 	player.rotreset=15
 	player.locktime=30
+	player.perfectclearframes=0
 end
 function collidetest(board,x,y)
 	local clipping = false
@@ -855,6 +857,7 @@ function tspintest(board,rotation,x,y)
 end
 function modmod(a,b)return a-math.floor(a/b)*b end
 function updateplayer(player)
+	player.perfectclearframes=player.perfectclearframes-1
 	if player.pieceactive == false and player.dead == false then
 		player.pieceactive = true
 		if not player.donotnext then
@@ -1117,12 +1120,28 @@ function updateplayer(player)
 			end
 		end
 		player.perfectclear = pccheck
+		if pccheck then
+			player.perfectclearframes=120
+		end
 		if player.lineclears > 0 then
 			love.audio.stop(lineclear)
 			love.audio.play(lineclear)
 			if player.tspin == "full" then
 				love.audio.stop(tspinnotify)
 				love.audio.play(tspinnotify)
+			end
+			if player.lineclears == 1 then
+				love.audio.stop(lineclearsingle)
+				love.audio.play(lineclearsingle)
+			elseif player.lineclears == 2 then
+				love.audio.stop(linecleardouble)
+				love.audio.play(linecleardouble)
+			elseif player.lineclears == 3 then
+				love.audio.stop(linecleartriple)
+				love.audio.play(linecleartriple)
+			elseif player.lineclears == 4 then
+				love.audio.stop(lineclearquad)
+				love.audio.play(lineclearquad)
 			end
 		end
 		if not player.amisafe then
@@ -1204,6 +1223,7 @@ frames = frames + (dt*60)
 				if p1.combo >= 6 then reattackeris = reattackeris + 1 end
 				if p1.combo >= 8 then reattackeris = reattackeris + 1 end
 				if p1.combo >= 11 then reattackeris = reattackeris + 1 end
+				if p1.perfectclear then reattackeris = reattackeris + 10 end
 				p1.attackincoming = p1.attackincoming - reattackeris
 				if p1.attackincoming < 0 then
 					p2.attackincoming = p2.attackincoming - p1.attackincoming
@@ -1243,6 +1263,7 @@ frames = frames + (dt*60)
 				if p2.combo >= 6 then reattackeris = reattackeris + 1 end
 				if p2.combo >= 8 then reattackeris = reattackeris + 1 end
 				if p2.combo >= 11 then reattackeris = reattackeris + 1 end
+				if p2.perfectclear then reattackeris = reattackeris + 10 end
 				p2.attackincoming = p2.attackincoming - reattackeris
 				if p2.attackincoming < 0 then
 					p1.attackincoming = p1.attackincoming - p2.attackincoming
@@ -1265,12 +1286,21 @@ frames = frames + (dt*60)
 	end
 	frames = frames - 1
 	end
+	tetrisparticles:setParticleLifetime(1)
+	tetrisparticles:setEmissionRate(60)
+	tetrisparticles:setLinearAcceleration(0,100)
+	tetrisparticles:setTexture(pieceimagetype.I)
+	if math.fmod(frameticks,120) >= 60 then
+	tetrisparticles:setTexture(pieceimagetype.O)
+	end
+	tetrisparticles:update( dt )
 end
 function drawsprite(image,x,y,cx,cy,sx,sy,rt)
 	love.graphics.push()
+	love.graphics.translate( x, y)
+	love.graphics.rotate(rt or 0)
 	love.graphics.scale(sx, sy)
-	--love.graphics.rotate(rt)
-	love.graphics.draw(image or pieceimagetype.G, (x-(cx*sx))*(1/sx), (y-(cy*sy))*(1/sy))
+	love.graphics.draw(image or pieceimagetype.G, -cx, -cy)
 	love.graphics.pop()
 end
 function drawpiece(sprite,piecetyperr,rotation,x,y,size,dimx,dimy,centx,centy)
@@ -1288,19 +1318,33 @@ function drawpiece(sprite,piecetyperr,rotation,x,y,size,dimx,dimy,centx,centy)
 		end
 	end
 end
+boarddrawable = love.graphics.newCanvas(320,480)
 function drawplayer(player,x,y,size)
+    love.graphics.setCanvas(boarddrawable)
+	love.graphics.clear(0, 0, 0, 0)
+	love.graphics.setBlendMode("alpha")
+	if player.perfectclearframes > 0 then
+		local sizexsize = 1
+		if player.perfectclearframes > 90 then
+			sizexsize = (120-player.perfectclearframes)/30
+		end
+		if player.perfectclearframes <= 30 then
+			sizexsize = (player.perfectclearframes)/30
+		end
+		drawsprite(perfectclearboard,160,240,80,160,sizexsize,sizexsize)
+	end
 	for boardgridy = 1,40 do
 		for boardgridx = 1,10 do
 			if player.board[boardgridy][boardgridx] ~= "E" then
-				drawsprite(pieceimagetype[player.board[boardgridy][boardgridx]], x+(boardgridx*16*size)-(88*size), y+(boardgridy*16*size)-((88+320+80)*size),8,8,size,size)
+				drawsprite(pieceimagetype[player.board[boardgridy][boardgridx]], 160+(boardgridx*16)-(88), 240+(boardgridy*16)-((88+320+80)),8,8,1,1)
 			end
 		end
 	end
-	drawsprite(board, x, y,88,240,size,size)
-	drawpiece(pieceimagetype[player.piecequeue[1]],player.piecequeue[1],0,x-(24*size),y-(216*size),size)
-	drawpiece(pieceimagetype[player.piecequeue[2]],player.piecequeue[2],0,x+(36*size),y-(196*size),size/2)
-	drawpiece(pieceimagetype[player.piecequeue[3]],player.piecequeue[3],0,x+(68*size),y-(196*size),size/2)
-	drawpiece(player.holdlock and pieceimagetype.G or pieceimagetype[player.holdpiece],player.holdpiece,0,x-(68*size),y-(196*size),size/2)
+	drawsprite(board, 160, 240,88,240,1,1)
+	drawpiece(pieceimagetype[player.piecequeue[1]],player.piecequeue[1],0,160-(24),240-(216),1)
+	drawpiece(pieceimagetype[player.piecequeue[2]],player.piecequeue[2],0,160+(36),240-(196),.5)
+	drawpiece(pieceimagetype[player.piecequeue[3]],player.piecequeue[3],0,160+(68),240-(196),.5)
+	drawpiece(player.holdlock and pieceimagetype.G or pieceimagetype[player.holdpiece],player.holdpiece,0,160-(68),240-(196),.5)
 	if player.pieceactive then
 		if math.fmod(frameticks,2) == 0 then
 			local fafjaeuo = player.piecey
@@ -1308,7 +1352,7 @@ function drawplayer(player,x,y,size)
 				fafjaeuo = fafjaeuo+1
 			end
 			fafjaeuo = fafjaeuo-1
-			drawpiece(pieceimagetype[player.piececurrent],player.piececurrent,player.piecerotation,x-(88*size)+(player.piecex*16*size),y-((88+320+80)*size)+(fafjaeuo*16*size),size)
+			drawpiece(pieceimagetype[player.piececurrent],player.piececurrent,player.piecerotation,160-(88)+(player.piecex*16),240-((88+320+80))+(fafjaeuo*16),1)
 		end
 		local swgjrbjdrgbreh = pieceimagetype.Active
 		if player.holdlock then
@@ -1317,8 +1361,8 @@ function drawplayer(player,x,y,size)
 		if math.fmod(frameticks,2) == 0 then
 			swgjrbjdrgbreh = pieceimagetype.ActiveDark
 		end
-		drawpiece(swgjrbjdrgbreh,player.piececurrent,player.piecerotation,x-(88*size)+(player.piecex*16*size),y-((88+320+80)*size)+(player.piecey*16*size),size,16,16,10,10)
-		drawpiece(pieceimagetype[player.piececurrent],player.piececurrent,player.piecerotation,x-(88*size)+(player.piecex*16*size),y-((88+320+80)*size)+(player.piecey*16*size),size)
+		drawpiece(swgjrbjdrgbreh,player.piececurrent,player.piecerotation,160-(88)+(player.piecex*16),240-((88+320+80)+(player.piecey*16)),1,16,16,10,10)
+		drawpiece(pieceimagetype[player.piececurrent],player.piececurrent,player.piecerotation,160-(88)+(player.piecex*16),240-((88+320+80))+(player.piecey*16),1)
 	end
 	local swgjrbjdrgbreh = "DNR"
 	if math.fmod(frameticks,8) >= 6 then
@@ -1330,7 +1374,7 @@ function drawplayer(player,x,y,size)
 	end
 	for g = 1,4 do
 		if swgjrbjdrgbreh ~= "DNR" and g <= player.attackincoming then
-			drawsprite(swgjrbjdrgbreh,x+(84*size),y+((168-(g*16))*size),4,8,size,size)
+			drawsprite(swgjrbjdrgbreh,160+(84),240+((168-(g*16))),4,8,1,1)
 		end
 	end
 	local swgjrbjdrgbreh = "DNR"
@@ -1339,7 +1383,7 @@ function drawplayer(player,x,y,size)
 	end
 	for g = 5,20 do
 		if swgjrbjdrgbreh ~= "DNR" and g <= player.attackincoming then
-			drawsprite(swgjrbjdrgbreh,x+(84*size),y+((168-(g*16))*size),4,8,size,size)
+			drawsprite(swgjrbjdrgbreh,160+(84),240+((168-(g*16))),4,8,1,1)
 		end
 	end
 	local swgjrbjdrgbreh = "DNR"
@@ -1348,9 +1392,12 @@ function drawplayer(player,x,y,size)
 	end
 	for g = 21,36 do
 		if swgjrbjdrgbreh ~= "DNR" and g <= player.attackincoming then
-			drawsprite(swgjrbjdrgbreh,x+(84*size),y+((168-(20*16)+((g-21)*16))*size),4,8,size,size)
+			drawsprite(swgjrbjdrgbreh,160+(84),240+((168-(20*16)+((g-21)*16))),4,8,1,1)
 		end
 	end
+    love.graphics.setCanvas()
+	love.graphics.setBlendMode("alpha", "premultiplied")
+	drawsprite(boarddrawable,x,y,160,240,size,size)
 end
 function love.draw()
 	love.graphics.draw(bg, 0, 0)
@@ -1378,4 +1425,5 @@ function love.draw()
 		drawsprite(p1info,160,280,80,160,size,size)
 		drawsprite(p2info,480,280,80,160,size,size)
 	end
+	love.graphics.draw(tetrisparticles, 0, 0)
 end
