@@ -35,6 +35,7 @@ function love.load()
 	garbagekick = love.audio.newSource("garbagekick.wav", "static")
 	lineclear = love.audio.newSource("lineclear.wav", "static")
 	dead = love.audio.newSource("dead.ogg", "static")
+	vanishdead = love.audio.newSource("vanishzoneoverload.wav", "static")
 	tspinnotify = love.audio.newSource("tspin.ogg", "static")
 	softlock = love.audio.newSource("softlock.wav", "static")
 	lineclearsingle = love.audio.newSource("linesingle.wav", "static")
@@ -306,6 +307,12 @@ end
 	function tablltablltabllcontains(list, x)
 		for _, v in pairs(list) do
 			if v == x then return true end
+		end
+		return false
+	end
+	function tablltablltabllelsecontains(list, x)
+		for _, v in pairs(list) do
+			if v ~= x then return true end
 		end
 		return false
 	end
@@ -911,18 +918,43 @@ function updateplayer(player)
 	end
 	if player.pieceactive == true and player.dead == false then
 		player.downwardtime=player.downwardtime-1
-		if piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey+1) then
-			player.downwardtime=downtimereset
-			player.locktime=player.locktime-1
-		else
-			player.locktime=30
+		if (not player.leftinput) or (player.leftinput and player.rightinput) then
+			player.leftdas = 10
 		end
-		if player.sdinput or player.downwardtime <= 0 then
-			player.downwardtime=downtimereset
-			player.piecey = player.piecey+1
-			if piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) then
-				player.piecey = player.piecey-1
+		if player.leftinput and (not(player.leftinput and player.rightinput)) then
+			if player.leftdas == 10 or player.leftdas < 0 then
+				ishemoving = true
+				player.piecex = player.piecex - 1
+				if piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) then
+					ishemoving = false
+					player.piecex = player.piecex + 1
+				end
+				if player.locktime < 30 and ishemoving then
+					player.locktime = 30
+					player.movereset = player.movereset - 1
+					player.tspin = "no"
+				end
 			end
+			player.leftdas = player.leftdas - 1
+		end
+		if (not player.rightinput) or (player.leftinput and player.rightinput) then
+			player.rightdas = 10
+		end
+		if player.rightinput and (not(player.leftinput and player.rightinput)) then
+			if player.rightdas == 10 or player.rightdas < 0 then
+				ishemoving = true
+				player.piecex = player.piecex + 1
+				if piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) then
+					ishemoving = false
+					player.piecex = player.piecex - 1
+				end
+				if player.locktime < 30 and ishemoving then
+					player.locktime = 30
+					player.movereset = player.movereset - 1
+					player.tspin = "no"
+				end
+			end
+			player.rightdas = player.rightdas - 1
 		end
 		if not player.ccwinput then
 			player.ccwlock = false
@@ -1015,46 +1047,21 @@ function updateplayer(player)
 				if player.locktime < 30 then
 					player.locktime = 30
 					player.rotreset = player.rotreset - 1
-					player.tspin = "no"
 				end
 			end
 		end
-		if (not player.leftinput) or (player.leftinput and player.rightinput) then
-			player.leftdas = 10
+		if piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey+1) then
+			player.downwardtime=downtimereset
+			player.locktime=player.locktime-1
+		else
+			player.locktime=30
 		end
-		if player.leftinput and (not(player.leftinput and player.rightinput)) then
-			if player.leftdas == 10 or player.leftdas < 0 then
-				ishemoving = true
-				player.piecex = player.piecex - 1
-				if piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) then
-					ishemoving = false
-					player.piecex = player.piecex + 1
-				end
-				if player.locktime < 30 and ishemoving then
-					player.locktime = 30
-					player.movereset = player.movereset - 1
-					player.tspin = "no"
-				end
+		if player.sdinput or player.downwardtime <= 0 then
+			player.downwardtime=downtimereset
+			player.piecey = player.piecey+1
+			if piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) then
+				player.piecey = player.piecey-1
 			end
-			player.leftdas = player.leftdas - 1
-		end
-		if (not player.rightinput) or (player.leftinput and player.rightinput) then
-			player.rightdas = 10
-		end
-		if player.rightinput and (not(player.leftinput and player.rightinput)) then
-			if player.rightdas == 10 or player.rightdas < 0 then
-				ishemoving = true
-				player.piecex = player.piecex + 1
-				if piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) then
-					ishemoving = false
-					player.piecex = player.piecex - 1
-				end
-				if player.locktime < 30 and ishemoving then
-					player.locktime = 30
-					player.movereset = player.movereset - 1
-				end
-			end
-			player.rightdas = player.rightdas - 1
 		end
 		if player.locktime <= 0 or player.movereset <= 0 or player.rotreset <= 0 and (not (player.hdinput or player.holdinput)) then
 			while piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) == false do
@@ -1124,6 +1131,7 @@ function updateplayer(player)
 			player.perfectclearframes=120
 		end
 		if player.lineclears > 0 then
+			player.amisafe=true
 			love.audio.stop(lineclear)
 			love.audio.play(lineclear)
 			if player.tspin == "full" then
@@ -1223,7 +1231,7 @@ frames = frames + (dt*60)
 				if p1.combo >= 6 then reattackeris = reattackeris + 1 end
 				if p1.combo >= 8 then reattackeris = reattackeris + 1 end
 				if p1.combo >= 11 then reattackeris = reattackeris + 1 end
-				if p1.perfectclear then reattackeris = reattackeris + 10 end
+				if p1.perfectclear then reattackeris = 10 end
 				p1.attackincoming = p1.attackincoming - reattackeris
 				if p1.attackincoming < 0 then
 					p2.attackincoming = p2.attackincoming - p1.attackincoming
@@ -1234,6 +1242,13 @@ frames = frames + (dt*60)
 			p1.combo = -1
 			local attackibility = 4
 			while p1.attackincoming > 0 and attackibility > 0 do
+				for ite = 1,10 do
+					if p1.board[1][ite] ~= "E" then
+						p1.dead = true
+						love.audio.stop(vanishdead)
+						love.audio.play(vanishdead)
+					end
+				end
 				table.remove(p1.board,1)
 				table.insert(p1.board,{"G","G","G","G","G","G","G","G","G","G",})
 				p1.board[40][love.math.random(1,10)] = "E"
@@ -1263,7 +1278,7 @@ frames = frames + (dt*60)
 				if p2.combo >= 6 then reattackeris = reattackeris + 1 end
 				if p2.combo >= 8 then reattackeris = reattackeris + 1 end
 				if p2.combo >= 11 then reattackeris = reattackeris + 1 end
-				if p2.perfectclear then reattackeris = reattackeris + 10 end
+				if p2.perfectclear then reattackeris = 10 end
 				p2.attackincoming = p2.attackincoming - reattackeris
 				if p2.attackincoming < 0 then
 					p1.attackincoming = p1.attackincoming - p2.attackincoming
@@ -1274,6 +1289,13 @@ frames = frames + (dt*60)
 			p2.combo = -1
 			local attackibility = 4
 			while p2.attackincoming > 0 and attackibility > 0 do
+				for ite = 1,10 do
+					if p2.board[1][ite] ~= "E" then
+						p2.dead = true
+						love.audio.stop(vanishdead)
+						love.audio.play(vanishdead)
+					end
+				end
 				table.remove(p2.board,1)
 				table.insert(p2.board,{"G","G","G","G","G","G","G","G","G","G",})
 				p2.board[40][love.math.random(1,10)] = "E"
