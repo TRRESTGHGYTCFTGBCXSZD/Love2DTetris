@@ -47,7 +47,6 @@ function love.load()
 	finish1p = love.audio.newSource("p1win.wav", "static")
 	finish2p = love.audio.newSource("p2win.wav", "static")
 	finishdrawcom = love.audio.newSource("drawgame.wav", "static")
-	tetrisparticles = love.graphics.newParticleSystem( bg, buffer )
 	downtimereset = 60
 	controls = {["P1Left"]={"kbd","left"},["P1Right"]={"kbd","right"},["P1SoftDrop"]={"kbd","down"},["P1HardDrop"]={"kbd","up"},["P1CCW"]={"kbd","z"},["P1CW"]={"kbd","x"},["P1Hold"]={"kbd","space"},
 	["P2Left"]={"none","none"},["P2Right"]={"none","none"},["P2SoftDrop"]={"none","none"},["P2HardDrop"]={"none","none"},["P2CCW"]={"none","none"},["P2CW"]={"none","none"},["P2Hold"]={"none","none"},}
@@ -878,7 +877,7 @@ function updateplayer(player)
 		player.piecex = 4
 		player.piecey = 17
 		player.piecerotation = 0
-		player.downwardtime=downtimereset
+		player.downwardtime=0
 		player.locktime = 30
 		player.movereset = 15
 		player.rotreset = 15
@@ -1221,7 +1220,7 @@ frames = frames + (dt*60)
 			else
 				p1.btbs = -1
 			end
-			if p1.lineclears >= 2 or p1.combo >= 2 then
+			if p1.lineclears >= 2 or p1.combo >= 2 or p1.tspin == "full" then
 				local reattackeris = p1.lineclears
 				if p1.lineclears < 4 and (not (p1.tspin == "full")) then reattackeris = reattackeris - 1 end
 				if p1.tspin == "full" then reattackeris = reattackeris * 2 end
@@ -1268,7 +1267,7 @@ frames = frames + (dt*60)
 			else
 				p2.btbs = -1
 			end
-			if p2.lineclears >= 2 or p2.combo >= 2 then
+			if p2.lineclears >= 2 or p2.combo >= 2 or p2.tspin == "full" then
 				local reattackeris = p2.lineclears
 				if p2.lineclears < 4 and (not (p1.tspin == "full")) then reattackeris = reattackeris - 1 end
 				if p2.tspin == "full" then reattackeris = reattackeris * 2 end
@@ -1308,14 +1307,6 @@ frames = frames + (dt*60)
 	end
 	frames = frames - 1
 	end
-	tetrisparticles:setParticleLifetime(1)
-	tetrisparticles:setEmissionRate(60)
-	tetrisparticles:setLinearAcceleration(0,100)
-	tetrisparticles:setTexture(pieceimagetype.I)
-	if math.fmod(frameticks,120) >= 60 then
-	tetrisparticles:setTexture(pieceimagetype.O)
-	end
-	tetrisparticles:update( dt )
 end
 function drawsprite(image,x,y,cx,cy,sx,sy,rt)
 	love.graphics.push()
@@ -1447,5 +1438,4 @@ function love.draw()
 		drawsprite(p1info,160,280,80,160,size,size)
 		drawsprite(p2info,480,280,80,160,size,size)
 	end
-	love.graphics.draw(tetrisparticles, 0, 0)
 end
