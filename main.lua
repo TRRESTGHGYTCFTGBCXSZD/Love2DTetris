@@ -903,9 +903,27 @@ function updateplayer(player)
 		player.cwlock = false
 		player.holdlock = false
 		player.tspin = "no"
-		if (player.ccwinput or player.cwinput) and (not(player.ccwinput and player.cwinput)) then
+		if player.ccwinput or player.cwinput then
+		player.ccwlock = true
+		player.cwlock = true
+		end
+		if player.ccwinput ~= player.cwinput then
+			if player.ccwinput then
+				if not piececollidetest(player.board,player.piececurrent,3,4,17) then
 			love.audio.stop(prerotate)
 			love.audio.play(prerotate)
+				player.piecerotation = 3
+				end
+				player.ccwlock = true
+			end
+			if player.cwinput then
+				if not piececollidetest(player.board,player.piececurrent,1,4,17) then
+			love.audio.stop(prerotate)
+			love.audio.play(prerotate)
+				player.piecerotation = 1
+				end
+				player.cwlock = true
+			end
 		end
 		if (player.holdinput or player.stillholding) and (not player.donotnext) then
 			love.audio.stop(prehold)
