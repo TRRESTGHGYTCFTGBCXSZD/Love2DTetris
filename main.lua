@@ -28,16 +28,18 @@ function love.load()
 	boardlose = love.graphics.newImage("boardlose.png")
 	boarddraw = love.graphics.newImage("boarddraw.png")
 	perfectclearboard = love.graphics.newImage("boardpc.png")
-	lock = love.audio.newSource("lock.wav", "static")
-	rotate = love.audio.newSource("rotate.wav", "static")
-	prerotate = love.audio.newSource("prerotate.wav", "static")
+	floored = love.audio.newSource("sakura/floor.ogg", "static")
+	lock = love.audio.newSource("sakura/sonic.ogg", "static")
+	move = love.audio.newSource("sakura/move.ogg", "static")
+	rotate = love.audio.newSource("sakura/rotate.ogg", "static")
+	prerotate = love.audio.newSource("sakura/prerotate.ogg", "static")
 	prehold = love.audio.newSource("prehold.wav", "static")
 	garbagekick = love.audio.newSource("garbagekick.wav", "static")
 	lineclear = love.audio.newSource("lineclear.wav", "static")
 	dead = love.audio.newSource("dead.ogg", "static")
 	vanishdead = love.audio.newSource("vanishzoneoverload.wav", "static")
 	tspinnotify = love.audio.newSource("tspin.ogg", "static")
-	softlock = love.audio.newSource("softlock.wav", "static")
+	softlock = love.audio.newSource("sakura/lock.ogg", "static")
 	lineclearsingle = love.audio.newSource("linesingle.wav", "static")
 	linecleardouble = love.audio.newSource("linedouble.wav", "static")
 	linecleartriple = love.audio.newSource("linetriple.wav", "static")
@@ -48,6 +50,7 @@ function love.load()
 	finish2p = love.audio.newSource("p2win.wav", "static")
 	finishdrawcom = love.audio.newSource("drawgame.wav", "static")
 	downtimereset = 60
+	entrydl = 10
 	controls = {["P1Left"]={"kbd","left"},["P1Right"]={"kbd","right"},["P1SoftDrop"]={"kbd","down"},["P1HardDrop"]={"kbd","up"},["P1CCW"]={"kbd","z"},["P1CW"]={"kbd","x"},["P1Hold"]={"kbd","space"},
 	["P2Left"]={"none","none"},["P2Right"]={"none","none"},["P2SoftDrop"]={"none","none"},["P2HardDrop"]={"none","none"},["P2CCW"]={"none","none"},["P2CW"]={"none","none"},["P2Hold"]={"none","none"},}
 	controleating = false
@@ -466,6 +469,7 @@ function initplayer(player)
 	player.rotreset=15
 	player.locktime=30
 	player.perfectclearframes=0
+	player.are=0
 end
 function collidetest(board,x,y)
 	local clipping = false
@@ -864,7 +868,21 @@ end
 function modmod(a,b)return a-math.floor(a/b)*b end
 function updateplayer(player)
 	player.perfectclearframes=player.perfectclearframes-1
-	if player.pieceactive == false and player.dead == false then
+	player.are = player.are - 1
+	if player.pieceactive == false and player.dead == false and player.are > 0 then
+		if (not player.leftinput) or (player.leftinput and player.rightinput) then
+			player.leftdas = 10
+		end
+		if player.leftinput and (not(player.leftinput and player.rightinput)) then
+			player.leftdas = player.leftdas - 1
+		end
+		if (not player.rightinput) or (player.leftinput and player.rightinput) then
+			player.rightdas = 10
+		end
+		if player.rightinput and (not(player.leftinput and player.rightinput)) then
+			player.rightdas = player.rightdas - 1
+		end
+	elseif player.pieceactive == false and player.dead == false and player.are <= 0 then
 		player.pieceactive = true
 		if not player.donotnext then
 			player.piececurrent = table.remove(player.piecequeue,1)
@@ -929,6 +947,8 @@ function updateplayer(player)
 					player.piecex = player.piecex + 1
 				end
 				if player.locktime < 30 and ishemoving then
+			love.audio.stop(move)
+			love.audio.play(move)
 					player.locktime = 30
 					player.movereset = player.movereset - 1
 					player.tspin = "no"
@@ -948,6 +968,8 @@ function updateplayer(player)
 					player.piecex = player.piecex - 1
 				end
 				if player.locktime < 30 and ishemoving then
+			love.audio.stop(move)
+			love.audio.play(move)
 					player.locktime = 30
 					player.movereset = player.movereset - 1
 					player.tspin = "no"
@@ -1050,6 +1072,10 @@ function updateplayer(player)
 			end
 		end
 		if piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey+1) then
+			if player.locktime == 30 then
+			love.audio.stop(floored)
+			love.audio.play(floored)
+			end
 			player.downwardtime=downtimereset
 			player.locktime=player.locktime-1
 		else
@@ -1102,6 +1128,8 @@ function updateplayer(player)
 			end
 			love.audio.stop(lock)
 			love.audio.play(lock)
+			love.audio.stop(softlock)
+			love.audio.play(softlock)
 		end
 		if player.holdinput and (not (player.holdlock or player.hdinput)) then
 			player.pieceactive = false
@@ -1109,8 +1137,9 @@ function updateplayer(player)
 			player.stillholding = true
 		end
 	end
-	if player.pieceactive == false and (not player.stillholding) and player.dead == false then
+	if player.pieceactive == false and (not player.stillholding) and player.dead == false and player.are <= 0 then
 		player.linecleartrigger = true
+		player.are = entrydl
 		player.lineclears = 0
 		local pccheck = true
 		for ita = 1,40 do
