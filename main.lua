@@ -34,10 +34,10 @@ function love.load()
 	rotate = love.audio.newSource("sakura/rotate.ogg", "static")
 	prerotate = love.audio.newSource("sakura/prerotate.ogg", "static")
 	prehold = love.audio.newSource("prehold.wav", "static")
-	garbagekick = love.audio.newSource("garbagekick.wav", "static")
+	garbagekick = love.audio.newSource("rowraise.wav", "static")
 	lineclear = love.audio.newSource("lineclear.wav", "static")
-	dead = love.audio.newSource("dead.ogg", "static")
-	vanishdead = love.audio.newSource("vanishzoneoverload.wav", "static")
+	dead = love.audio.newSource("smack.wav", "static")
+	vanishdead = love.audio.newSource("doublebonk.wav", "static")
 	tspinnotify = love.audio.newSource("tspin.ogg", "static")
 	softlock = love.audio.newSource("sakura/lock.ogg", "static")
 	lineclearsingle = love.audio.newSource("linesingle.wav", "static")
@@ -49,6 +49,10 @@ function love.load()
 	finish1p = love.audio.newSource("p1win.wav", "static")
 	finish2p = love.audio.newSource("p2win.wav", "static")
 	finishdrawcom = love.audio.newSource("drawgame.wav", "static")
+	
+	selected = love.audio.newSource("keyselect.wav", "static")
+	decided = love.audio.newSource("keyok.wav", "static")
+	
 	downtimereset = 60
 	entrydl = 10
 	controls = {["P1Left"]={"kbd","left"},["P1Right"]={"kbd","right"},["P1SoftDrop"]={"kbd","down"},["P1HardDrop"]={"kbd","up"},["P1CCW"]={"kbd","z"},["P1CW"]={"kbd","x"},["P1Hold"]={"kbd","space"},
@@ -500,8 +504,8 @@ function love.keypressed(key, scancode, isrepeat)
 	controls[whatcontroleating][1] = "kbd"
 	controls[whatcontroleating][2] = key
 	controleating = false
-	love.audio.stop(tspinnotify)
-	love.audio.play(tspinnotify)
+	love.audio.stop(decided)
+	love.audio.play(decided)
 	else
 	if controls.P1CCW[1] == "kbd" and key == controls.P1CCW[2] then
 		p1.ccwinput=true
@@ -596,8 +600,8 @@ function love.gamepadpressed(control, key)
 	controls[whatcontroleating][1] = control
 	controls[whatcontroleating][2] = key
 	controleating = false
-	love.audio.stop(tspinnotify)
-	love.audio.play(tspinnotify)
+	love.audio.stop(decided)
+	love.audio.play(decided)
 	else
 	if controls.P1CCW[1] == control and key == controls.P1CCW[2] then
 		p1.ccwinput=true
@@ -691,8 +695,8 @@ function love.gamepadaxis(control, key, activation)
 	if controleating and activation >= 0.5 then
 	controls[whatcontroleating][1] = control
 	controls[whatcontroleating][2] = key
-	love.audio.stop(tspinnotify)
-	love.audio.play(tspinnotify)
+	love.audio.stop(decided)
+	love.audio.play(decided)
 	else
 	if controls.P1CCW[1] == control and key == controls.P1CCW[2] then
 		p1.ccwinput=activation >= 0.5
@@ -746,86 +750,86 @@ function love.mousepressed( x, y, button, istouch, presses )
 		controleating = false
 	elseif y <= 15 then
 		if 0 <= x and x <= 15 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1CCW"
 		end
 		if 16 <= x and x <= 31 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1CW"
 		end
 		if 32 <= x and x <= 47 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1Left"
 		end
 		if 48 <= x and x <= 63 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1Right"
 		end
 		if 64 <= x and x <= 79 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1SoftDrop"
 		end
 		if 80 <= x and x <= 95 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1HardDrop"
 		end
 		if 96 <= x and x <= 111 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1Hold"
 		end
 		if 128 <= x and x <= 15+128 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2CCW"
 		end
 		if 16+128 <= x and x <= 31+128 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2CW"
 		end
 		if 32+128 <= x and x <= 47+128 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2Left"
 		end
 		if 48+128 <= x and x <= 63+128 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2Right"
 		end
 		if 64+128 <= x and x <= 79+128 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2SoftDrop"
 		end
 		if 80+128 <= x and x <= 95+128 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2HardDrop"
 		end
 		if 96+128 <= x and x <= 111+128 then
-			love.audio.stop(lock)
-			love.audio.play(lock)
+			love.audio.stop(selected)
+			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2Hold"
 		end
