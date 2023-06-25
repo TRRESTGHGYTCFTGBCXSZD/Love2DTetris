@@ -309,6 +309,7 @@ function love.load()
 	initplayer(p1)
 	p2 = {}
 	initplayer(p2)
+	renderstage = love.graphics.newCanvas(640,480)
 end
 	function tablltablltabllcontains(list, x)
 		for _, v in pairs(list) do
@@ -748,86 +749,86 @@ function love.mousepressed( x, y, button, istouch, presses )
 		love.audio.stop(dead)
 		love.audio.play(dead)
 		controleating = false
-	elseif y <= 15 then
-		if 0 <= x and x <= 15 then
+	elseif y < 16*torturey then
+		if 0 <= x and x < 16*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1CCW"
 		end
-		if 16 <= x and x <= 31 then
+		if 16*torturex <= x and x < 32*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1CW"
 		end
-		if 32 <= x and x <= 47 then
+		if 32*torturex <= x and x < 48*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1Left"
 		end
-		if 48 <= x and x <= 63 then
+		if 48*torturex <= x and x < 64*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1Right"
 		end
-		if 64 <= x and x <= 79 then
+		if 64*torturex <= x and x < 80*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1SoftDrop"
 		end
-		if 80 <= x and x <= 95 then
+		if 80*torturex <= x and x < 96*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1HardDrop"
 		end
-		if 96 <= x and x <= 111 then
+		if 96*torturex <= x and x < 112*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P1Hold"
 		end
-		if 128 <= x and x <= 15+128 then
+		if 128*torturex <= x and x < 144*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2CCW"
 		end
-		if 16+128 <= x and x <= 31+128 then
+		if 144*torturex <= x and x < 160*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2CW"
 		end
-		if 32+128 <= x and x <= 47+128 then
+		if 160*torturex <= x and x < 176*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2Left"
 		end
-		if 48+128 <= x and x <= 63+128 then
+		if 176*torturex <= x and x < 192*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2Right"
 		end
-		if 64+128 <= x and x <= 79+128 then
+		if 192*torturex <= x and x < 224*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2SoftDrop"
 		end
-		if 80+128 <= x and x <= 95+128 then
+		if 224*torturex <= x and x <= 240*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2HardDrop"
 		end
-		if 96+128 <= x and x <= 111+128 then
+		if 240*torturex <= x and x <= 256*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
@@ -1388,6 +1389,7 @@ function drawpiece(sprite,piecetyperr,rotation,x,y,size,dimx,dimy,centx,centy)
 end
 boarddrawable = love.graphics.newCanvas(320,480)
 function drawplayer(player,x,y,size)
+	local lastcanvas = love.graphics.getCanvas()
     love.graphics.setCanvas(boarddrawable)
 	love.graphics.clear(0, 0, 0, 0)
 	love.graphics.setBlendMode("alpha")
@@ -1463,11 +1465,13 @@ function drawplayer(player,x,y,size)
 			drawsprite(swgjrbjdrgbreh,160+(84),240+((168-(20*16)+((g-21)*16))),4,8,1,1)
 		end
 	end
-    love.graphics.setCanvas()
+    love.graphics.setCanvas(lastcanvas)
 	love.graphics.setBlendMode("alpha", "premultiplied")
 	drawsprite(boarddrawable,x,y,160,240,size,size)
 end
 function love.draw()
+	torturex, torturey = love.graphics.getWidth( )/640, love.graphics.getHeight( )/480
+    love.graphics.setCanvas(renderstage)
 	love.graphics.draw(bg, 0, 0)
 	drawplayer(p1,160,280,1)
 	drawplayer(p2,480,280,1)
@@ -1493,4 +1497,9 @@ function love.draw()
 		drawsprite(p1info,160,280,80,160,size,size)
 		drawsprite(p2info,480,280,80,160,size,size)
 	end
+    love.graphics.setCanvas()
+	love.graphics.push()
+	love.graphics.scale(love.graphics.getWidth( )/640, love.graphics.getHeight( )/480)
+	love.graphics.draw(renderstage, 0, 0)
+	love.graphics.pop()
 end
