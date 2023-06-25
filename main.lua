@@ -968,9 +968,11 @@ function updateplayer(player)
 					ishemoving = false
 					player.piecex = player.piecex + 1
 				end
-				if player.locktime < 30 and ishemoving then
+				if ishemoving then
 			love.audio.stop(move)
 			love.audio.play(move)
+				end
+				if player.locktime < 30 and ishemoving then
 					player.locktime = 30
 					player.movereset = player.movereset - 1
 					player.tspin = "no"
@@ -989,9 +991,11 @@ function updateplayer(player)
 					ishemoving = false
 					player.piecex = player.piecex - 1
 				end
-				if player.locktime < 30 and ishemoving then
+				if ishemoving then
 			love.audio.stop(move)
 			love.audio.play(move)
+				end
+				if player.locktime < 30 and ishemoving then
 					player.locktime = 30
 					player.movereset = player.movereset - 1
 					player.tspin = "no"
