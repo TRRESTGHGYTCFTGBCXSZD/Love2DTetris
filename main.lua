@@ -816,19 +816,19 @@ function love.mousepressed( x, y, button, istouch, presses )
 			controleating = true
 			whatcontroleating = "P2Right"
 		end
-		if 192*torturex <= x and x < 224*torturex then
+		if 192*torturex <= x and x < 208*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2SoftDrop"
 		end
-		if 224*torturex <= x and x <= 240*torturex then
+		if 208*torturex <= x and x <= 224*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
 			whatcontroleating = "P2HardDrop"
 		end
-		if 240*torturex <= x and x <= 256*torturex then
+		if 224*torturex <= x and x <= 240*torturex then
 			love.audio.stop(selected)
 			love.audio.play(selected)
 			controleating = true
@@ -1431,7 +1431,7 @@ function drawplayer(player,x,y,size)
 		if math.fmod(frameticks,2) == 0 then
 			swgjrbjdrgbreh = pieceimagetype.ActiveDark
 		end
-		drawpiece(swgjrbjdrgbreh,player.piececurrent,player.piecerotation,160-(88)+(player.piecex*16),240-((88+320+80)+(player.piecey*16)),1,16,16,10,10)
+		drawpiece(swgjrbjdrgbreh,player.piececurrent,player.piecerotation,160-(88)+(player.piecex*16),240-((88+320+80))+(player.piecey*16),1,16,16,10,10)
 		drawpiece(pieceimagetype[player.piececurrent],player.piececurrent,player.piecerotation,160-(88)+(player.piecex*16),240-((88+320+80))+(player.piecey*16),1)
 	end
 	local swgjrbjdrgbreh = "DNR"
