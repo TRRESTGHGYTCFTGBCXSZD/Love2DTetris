@@ -1128,6 +1128,9 @@ function updateplayer(player)
 		end
 		
 		if player.sdinput or player.downwardtime >= 1 then
+			if player.sdinput and player.downwardtime < 1 then
+				player.downwardtime = 1
+			end
 			while piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) == false and player.downwardtime >= 1 do
 				player.piecey = player.piecey+1
 				player.downwardtime = player.downwardtime - 1
