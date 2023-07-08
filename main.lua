@@ -1235,7 +1235,7 @@ function updateplayer(player)
 				love.audio.play(linecleartriple)
 			elseif player.lineclears == 4 then
 				love.audio.stop(lineclearquad)
-				love.audio.play(lineclearquad)
+				--love.audio.play(lineclearquad)
 			end
 		end
 		if not player.amisafe then
