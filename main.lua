@@ -53,8 +53,8 @@ function love.load()
 	selected = love.audio.newSource("keyselect.wav", "static")
 	decided = love.audio.newSource("keyok.wav", "static")
 	
-	downtimereset = 60
 	entrydl = 10
+	timepassed = 10
 	controls = {["P1Left"]={"kbd","left"},["P1Right"]={"kbd","right"},["P1SoftDrop"]={"kbd","down"},["P1HardDrop"]={"kbd","up"},["P1CCW"]={"kbd","z"},["P1CW"]={"kbd","x"},["P1Hold"]={"kbd","space"},
 	["P2Left"]={"none","none"},["P2Right"]={"none","none"},["P2SoftDrop"]={"none","none"},["P2HardDrop"]={"none","none"},["P2CCW"]={"none","none"},["P2CW"]={"none","none"},["P2Hold"]={"none","none"},}
 	controleating = false
@@ -148,158 +148,158 @@ function love.load()
 	},
 	["O"]={
 	[0]={
+	{0,1,1,0},
+	{0,1,1,0},
 	{0,0,0,0},
-	{0,1,1,0},
-	{0,1,1,0},
 	{0,0,0,0},
 	},
 	[1]={
+	{0,1,1,0},
+	{0,1,1,0},
 	{0,0,0,0},
-	{0,1,1,0},
-	{0,1,1,0},
 	{0,0,0,0},
 	},
 	[2]={
+	{0,1,1,0},
+	{0,1,1,0},
 	{0,0,0,0},
-	{0,1,1,0},
-	{0,1,1,0},
 	{0,0,0,0},
 	},
 	[3]={
+	{0,1,1,0},
+	{0,1,1,0},
 	{0,0,0,0},
-	{0,1,1,0},
-	{0,1,1,0},
 	{0,0,0,0},
 	},
 	},
 	["T"]={
 	[0]={
-	{0,0,0,0},
 	{0,1,0,0},
 	{1,1,1,0},
+	{0,0,0,0},
 	{0,0,0,0},
 	},
 	[1]={
-	{0,0,0,0},
 	{0,1,0,0},
 	{0,1,1,0},
 	{0,1,0,0},
+	{0,0,0,0},
 	},
 	[2]={
 	{0,0,0,0},
-	{0,0,0,0},
 	{1,1,1,0},
 	{0,1,0,0},
+	{0,0,0,0},
 	},
 	[3]={
-	{0,0,0,0},
 	{0,1,0,0},
 	{1,1,0,0},
 	{0,1,0,0},
+	{0,0,0,0},
 	},
 	},
 	["J"]={
 	[0]={
-	{0,0,0,0},
 	{1,0,0,0},
 	{1,1,1,0},
 	{0,0,0,0},
+	{0,0,0,0},
 	},
 	[1]={
-	{0,0,0,0},
 	{0,1,1,0},
 	{0,1,0,0},
 	{0,1,0,0},
+	{0,0,0,0},
 	},
 	[2]={
 	{0,0,0,0},
-	{0,0,0,0},
 	{1,1,1,0},
 	{0,0,1,0},
+	{0,0,0,0},
 	},
 	[3]={
-	{0,0,0,0},
 	{0,1,0,0},
 	{0,1,0,0},
 	{1,1,0,0},
+	{0,0,0,0},
 	},
 	},
 	["L"]={
 	[0]={
-	{0,0,0,0},
 	{0,0,1,0},
 	{1,1,1,0},
 	{0,0,0,0},
+	{0,0,0,0},
 	},
 	[1]={
-	{0,0,0,0},
 	{0,1,0,0},
 	{0,1,0,0},
 	{0,1,1,0},
+	{0,0,0,0},
 	},
 	[2]={
 	{0,0,0,0},
-	{0,0,0,0},
 	{1,1,1,0},
 	{1,0,0,0},
+	{0,0,0,0},
 	},
 	[3]={
-	{0,0,0,0},
 	{1,1,0,0},
 	{0,1,0,0},
 	{0,1,0,0},
+	{0,0,0,0},
 	},
 	},
 	["Z"]={
 	[0]={
-	{0,0,0,0},
 	{1,1,0,0},
 	{0,1,1,0},
+	{0,0,0,0},
 	{0,0,0,0},
 	},
 	[1]={
-	{0,0,0,0},
 	{0,0,1,0},
 	{0,1,1,0},
 	{0,1,0,0},
+	{0,0,0,0},
 	},
 	[2]={
 	{0,0,0,0},
-	{0,0,0,0},
 	{1,1,0,0},
 	{0,1,1,0},
+	{0,0,0,0},
 	},
 	[3]={
-	{0,0,0,0},
 	{0,1,0,0},
 	{1,1,0,0},
 	{1,0,0,0},
+	{0,0,0,0},
 	},
 	},
 	["S"]={
 	[0]={
-	{0,0,0,0},
 	{0,1,1,0},
 	{1,1,0,0},
+	{0,0,0,0},
 	{0,0,0,0},
 	},
 	[1]={
-	{0,0,0,0},
 	{0,1,0,0},
 	{0,1,1,0},
 	{0,0,1,0},
+	{0,0,0,0},
 	},
 	[2]={
 	{0,0,0,0},
-	{0,0,0,0},
 	{0,1,1,0},
 	{1,1,0,0},
+	{0,0,0,0},
 	},
 	[3]={
-	{0,0,0,0},
 	{1,0,0,0},
 	{1,1,0,0},
 	{0,1,0,0},
+	{0,0,0,0},
 	},
 	},
 	}
@@ -310,6 +310,9 @@ function love.load()
 	p2 = {}
 	initplayer(p2)
 	renderstage = love.graphics.newCanvas(640,480)
+end
+function getgravityforlevel(level)
+	return (1/60)/((.8-((level-1)*.007))^(level-1))
 end
 	function tablltablltabllcontains(list, x)
 		for _, v in pairs(list) do
@@ -469,12 +472,16 @@ function initplayer(player)
 	player.donotnext=false
 	player.stillholding=false
 	player.amisafe=true
-	player.downwardtime=downtimereset
+	player.downwardtime=0
 	player.movereset=15
 	player.rotreset=15
 	player.locktime=30
 	player.perfectclearframes=0
 	player.are=0
+	player.lastpieceplaced="E"
+	player.lastpieceplacedx=0
+	player.lastpieceplacedy=0
+	player.lastpieceplacedglow=0
 end
 function collidetest(board,x,y)
 	local clipping = false
@@ -873,6 +880,7 @@ end
 function modmod(a,b)return a-math.floor(a/b)*b end
 function updateplayer(player)
 	player.perfectclearframes=player.perfectclearframes-1
+	player.lastpieceplacedglow=player.lastpieceplacedglow-1
 	player.are = player.are - 1
 	if player.pieceactive == false and player.dead == false and player.are > 0 then
 		if (not player.leftinput) or (player.leftinput and player.rightinput) then
@@ -891,16 +899,16 @@ function updateplayer(player)
 		player.pieceactive = true
 		if not player.donotnext then
 			player.piececurrent = table.remove(player.piecequeue,1)
-			if #player.piecequeue < 3 then
+			if #player.piecequeue < 6 then
 				for _, h in pairs(sevenbag()) do
 					table.insert(player.piecequeue,h)
 				end
 			end
 		end
 		player.piecex = 4
-		player.piecey = 17
+		player.piecey = 19
 		player.piecerotation = 0
-		player.downwardtime=0
+		player.downwardtime = 1
 		player.locktime = 30
 		player.movereset = 15
 		player.rotreset = 15
@@ -914,7 +922,7 @@ function updateplayer(player)
 		end
 		if player.ccwinput ~= player.cwinput then
 			if player.ccwinput then
-				if not piececollidetest(player.board,player.piececurrent,3,4,17) then
+				if not piececollidetest(player.board,player.piececurrent,3,4,19) then
 			love.audio.stop(prerotate)
 			love.audio.play(prerotate)
 				player.piecerotation = 3
@@ -922,7 +930,7 @@ function updateplayer(player)
 				player.ccwlock = true
 			end
 			if player.cwinput then
-				if not piececollidetest(player.board,player.piececurrent,1,4,17) then
+				if not piececollidetest(player.board,player.piececurrent,1,4,19) then
 			love.audio.stop(prerotate)
 			love.audio.play(prerotate)
 				player.piecerotation = 1
@@ -941,7 +949,7 @@ function updateplayer(player)
 			if player.holdpiece == "E" then
 				player.holdpiece = player.piececurrent
 				player.piececurrent = table.remove(player.piecequeue,1)
-				if #player.piecequeue < 3 then
+				if #player.piecequeue < 6 then
 					for _, h in pairs(sevenbag()) do
 						table.insert(player.piecequeue,h)
 					end
@@ -957,10 +965,13 @@ function updateplayer(player)
 		end
 	end
 	if player.pieceactive == true and player.dead == false then
-		player.downwardtime=player.downwardtime-1
+		
+		player.downwardtime=player.downwardtime+getgravityforlevel(10)
+		
 		if (not player.leftinput) or (player.leftinput and player.rightinput) then
 			player.leftdas = 10
 		end
+		
 		if player.leftinput and (not(player.leftinput and player.rightinput)) then
 			if player.leftdas == 10 or player.leftdas < 0 then
 				ishemoving = true
@@ -981,9 +992,11 @@ function updateplayer(player)
 			end
 			player.leftdas = player.leftdas - 1
 		end
+		
 		if (not player.rightinput) or (player.leftinput and player.rightinput) then
 			player.rightdas = 10
 		end
+		
 		if player.rightinput and (not(player.leftinput and player.rightinput)) then
 			if player.rightdas == 10 or player.rightdas < 0 then
 				ishemoving = true
@@ -1004,9 +1017,11 @@ function updateplayer(player)
 			end
 			player.rightdas = player.rightdas - 1
 		end
+		
 		if not player.ccwinput then
 			player.ccwlock = false
 		end
+		
 		if player.ccwinput and (not player.ccwlock) then
 			player.ccwlock = true
 			local kicklol = player.piecerotation
@@ -1051,9 +1066,11 @@ function updateplayer(player)
 				end
 			end
 		end
+		
 		if not player.cwinput then
 			player.cwlock = false
 		end
+		
 		if player.cwinput and (not player.cwlock) then
 			player.cwlock = true
 			local kicklol = player.piecerotation
@@ -1098,23 +1115,28 @@ function updateplayer(player)
 				end
 			end
 		end
+		
 		if piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey+1) then
 			if player.locktime == 30 then
 			love.audio.stop(floored)
 			love.audio.play(floored)
 			end
-			player.downwardtime=downtimereset
+			player.downwardtime=0
 			player.locktime=player.locktime-1
 		else
 			player.locktime=30
 		end
-		if player.sdinput or player.downwardtime <= 0 then
-			player.downwardtime=downtimereset
-			player.piecey = player.piecey+1
+		
+		if player.sdinput or player.downwardtime >= 1 then
+			while piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) == false and player.downwardtime >= 1 do
+				player.piecey = player.piecey+1
+				player.downwardtime = player.downwardtime - 1
+			end
 			if piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) then
 				player.piecey = player.piecey-1
 			end
 		end
+		
 		if player.locktime <= 0 or player.movereset <= 0 or player.rotreset <= 0 and (not (player.hdinput or player.holdinput)) then
 			while piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) == false do
 				player.piecey = player.piecey+1
@@ -1135,6 +1157,7 @@ function updateplayer(player)
 			love.audio.stop(softlock)
 			love.audio.play(softlock)
 		end
+		
 		if player.hdinput then
 			while piececollidetest(player.board,player.piececurrent,player.piecerotation,player.piecex,player.piecey) == false do
 				player.piecey = player.piecey+1
@@ -1158,6 +1181,7 @@ function updateplayer(player)
 			love.audio.stop(softlock)
 			love.audio.play(softlock)
 		end
+		
 		if player.holdinput and (not (player.holdlock or player.hdinput)) then
 			player.pieceactive = false
 			player.donotnext = true
@@ -1165,6 +1189,10 @@ function updateplayer(player)
 		end
 	end
 	if player.pieceactive == false and (not player.stillholding) and player.dead == false and player.are <= 0 then
+		player.lastpieceplacedglow=20
+		player.lastpieceplacedx=player.piecex
+		player.lastpieceplacedy=player.piecey
+		player.lastpieceplaced=player.piececurrent
 		player.linecleartrigger = true
 		player.are = entrydl
 		player.lineclears = 0
@@ -1372,6 +1400,33 @@ function drawsprite(image,x,y,cx,cy,sx,sy,rt)
 	love.graphics.draw(image or pieceimagetype.G, -cx, -cy)
 	love.graphics.pop()
 end
+function drawpiece_queue(sprite,piecetyperr,rotation,x,y,size,dimx,dimy,centx,centy)
+	if not piecetyperr then return end
+	if piecetyperr == "E" then return end
+	dimx = dimx or 16
+	dimy = dimy or 16
+	centx = centx or 8
+	centy = centy or 8
+	if piecetyperr == "I" then
+		drawsprite(sprite, x+((1-1)*dimx*size), y+((2.5-1)*dimy*size),centx,centy,size,size)
+		drawsprite(sprite, x+((2-1)*dimx*size), y+((2.5-1)*dimy*size),centx,centy,size,size)
+		drawsprite(sprite, x+((3-1)*dimx*size), y+((2.5-1)*dimy*size),centx,centy,size,size)
+		drawsprite(sprite, x+((4-1)*dimx*size), y+((2.5-1)*dimy*size),centx,centy,size,size)
+	elseif piecetyperr == "O" then
+		drawsprite(sprite, x+((2-1)*dimx*size), y+((2-1)*dimy*size),centx,centy,size,size)
+		drawsprite(sprite, x+((3-1)*dimx*size), y+((2-1)*dimy*size),centx,centy,size,size)
+		drawsprite(sprite, x+((2-1)*dimx*size), y+((3-1)*dimy*size),centx,centy,size,size)
+		drawsprite(sprite, x+((3-1)*dimx*size), y+((3-1)*dimy*size),centx,centy,size,size)
+	else
+	for pies2 = 1 ,3 do
+		for pies1 = 1 ,3 do
+			if piecetype[piecetyperr][rotation][pies2][pies1] == 1 then
+				drawsprite(sprite, x+((pies1-.5)*dimx*size), y+((pies2)*dimy*size),centx,centy,size,size)
+			end
+		end
+	end
+	end
+end
 function drawpiece(sprite,piecetyperr,rotation,x,y,size,dimx,dimy,centx,centy)
 	if not piecetyperr then return end
 	if piecetyperr == "E" then return end
@@ -1388,6 +1443,7 @@ function drawpiece(sprite,piecetyperr,rotation,x,y,size,dimx,dimy,centx,centy)
 	end
 end
 boarddrawable = love.graphics.newCanvas(320,480)
+pieceglow = love.graphics.newCanvas(64,64)
 function drawplayer(player,x,y,size)
 	local lastcanvas = love.graphics.getCanvas()
     love.graphics.setCanvas(boarddrawable)
@@ -1403,18 +1459,26 @@ function drawplayer(player,x,y,size)
 		end
 		drawsprite(perfectclearboard,160,240,80,160,sizexsize,sizexsize)
 	end
-	for boardgridy = 1,40 do
+	for boardgridy = 20,40 do
 		for boardgridx = 1,10 do
 			if player.board[boardgridy][boardgridx] ~= "E" then
 				drawsprite(pieceimagetype[player.board[boardgridy][boardgridx]], 160+(boardgridx*16)-(88), 240+(boardgridy*16)-((88+320+80)),8,8,1,1)
 			end
 		end
 	end
-	drawsprite(board, 160, 240,88,240,1,1)
-	drawpiece(pieceimagetype[player.piecequeue[1]],player.piecequeue[1],0,160-(24),240-(216),1)
-	drawpiece(pieceimagetype[player.piecequeue[2]],player.piecequeue[2],0,160+(36),240-(196),.5)
-	drawpiece(pieceimagetype[player.piecequeue[3]],player.piecequeue[3],0,160+(68),240-(196),.5)
-	drawpiece(player.holdlock and pieceimagetype.G or pieceimagetype[player.holdpiece],player.holdpiece,0,160-(68),240-(196),.5)
+	--drawsprite(board, 160, 240,88,240,1,1)
+	drawsprite(board, 160, 240,128,168,1,1)
+	--drawpiece_queue(pieceimagetype[player.piecequeue[1]],player.piecequeue[1],0,160-(24),240-(216),1)
+	--drawpiece(pieceimagetype[player.piecequeue[2]],player.piecequeue[2],0,160+(36),240-(196),.5)
+	--drawpiece(pieceimagetype[player.piecequeue[3]],player.piecequeue[3],0,160+(68),240-(196),.5)
+	drawpiece_queue(pieceimagetype[player.piecequeue[1]],player.piecequeue[1],0,160+(96),240-(160),1)
+	drawpiece_queue(pieceimagetype[player.piecequeue[2]],player.piecequeue[2],0,160+(92),240-(116),.5)
+	drawpiece_queue(pieceimagetype[player.piecequeue[3]],player.piecequeue[3],0,160+(92),240-(94),.5)
+	drawpiece_queue(pieceimagetype[player.piecequeue[4]],player.piecequeue[4],0,160+(92),240-(70),.5)
+	drawpiece_queue(pieceimagetype[player.piecequeue[5]],player.piecequeue[5],0,160+(92),240-(48),.5)
+	drawpiece_queue(pieceimagetype[player.piecequeue[6]],player.piecequeue[6],0,160+(92),240-(24),.5)
+	--drawpiece(player.holdlock and pieceimagetype.G or pieceimagetype[player.holdpiece],player.holdpiece,0,160-(68),240-(196),.5)
+	drawpiece_queue(player.holdlock and pieceimagetype.G or pieceimagetype[player.holdpiece],player.holdpiece,0,160-(116),240-(164),.5)
 	if player.pieceactive then
 		if math.fmod(frameticks,2) == 0 then
 			local fafjaeuo = player.piecey
@@ -1470,11 +1534,11 @@ function drawplayer(player,x,y,size)
 	drawsprite(boarddrawable,x,y,160,240,size,size)
 end
 function love.draw()
-	torturex, torturey = love.graphics.getWidth( )/640, love.graphics.getHeight( )/480
+	torturex, torturey = (love.graphics.getWidth() or 640)/640, (love.graphics.getHeight() or 480)/480
     love.graphics.setCanvas(renderstage)
 	love.graphics.draw(bg, 0, 0)
-	drawplayer(p1,160,280,1)
-	drawplayer(p2,480,280,1)
+	drawplayer(p1,160,240,1)
+	drawplayer(p2,480,240,1)
 	--font = love.graphics.getFont()
 	if resettime <= 240 then
 		if winner == "p1" then
