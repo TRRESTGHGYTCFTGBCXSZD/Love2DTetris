@@ -1536,8 +1536,11 @@ function drawplayer(player,x,y,size)
 	love.graphics.setBlendMode("alpha", "premultiplied")
 	drawsprite(boarddrawable,x,y,160,240,size,size)
 end
+torturex, torturey = 640,480
 function love.draw()
+	pcall(function()
 	torturex, torturey = (love.graphics.getWidth() or 640)/640, (love.graphics.getHeight() or 480)/480
+	end)
     love.graphics.setCanvas(renderstage)
 	love.graphics.draw(bg, 0, 0)
 	drawplayer(p1,160,240,1)
