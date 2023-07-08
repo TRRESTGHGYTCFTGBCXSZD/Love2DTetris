@@ -858,10 +858,10 @@ function piececollidetest(board,piecetyperr,rotation,x,y)
 end
 function tspintest(board,rotation,x,y)
 	local tspin = "no"
-	local tspina = collidetest(board,x,y+1)
-	local tspinb = collidetest(board,x+2,y+1)
-	local tspinc = collidetest(board,x,y+3)
-	local tspind = collidetest(board,x+2,y+3)
+	local tspina = collidetest(board,x,y)
+	local tspinb = collidetest(board,x+2,y)
+	local tspinc = collidetest(board,x,y+2)
+	local tspind = collidetest(board,x+2,y+2)
 	if rotation == 0 or rotation == 2 then
 		if tspina and tspinb and (tspinc or tspind) then
 			tspin = rotation == 0 and "full" or "mini"
